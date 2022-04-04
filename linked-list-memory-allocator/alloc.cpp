@@ -19,7 +19,7 @@ namespace alloc
 
     static megablock_header* root = nullptr;
 
-    std::size_t add_region(void* buf, size_t size)
+    std::size_t add_region(void* buf, std::size_t size)
     {
         size &= ~7;
 
@@ -121,7 +121,7 @@ namespace alloc
         if (buffer == nullptr)
             return;
 
-        std::size_t* type = (size_t*)buffer - 1;
+        std::size_t* type = (std::size_t*)buffer - 1;
         block_header* hdr = (block_header*)buffer - 1;
 
         if (*type & 2)
