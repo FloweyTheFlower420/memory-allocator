@@ -4,7 +4,7 @@
 
 namespace alloc
 {
-    size_t add_region(void*, std::size_t);
+    std::size_t add_region(void*, std::size_t);
     void remove_region(void*);
     void* malloc(std::size_t);
     void* realloc(void*, std::size_t);
