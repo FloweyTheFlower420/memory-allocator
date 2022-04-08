@@ -96,7 +96,7 @@ namespace alloc
         return nullptr;
     }
 
-    void* aligned_alloc(std::size_t size, std::size_t align)
+    void* aligned_malloc(std::size_t size, std::size_t align)
     {
         void* buffer = malloc(size + align - 1);
         // TODO: implement
