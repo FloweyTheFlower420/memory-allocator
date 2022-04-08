@@ -5,9 +5,9 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
 
+#include <compare>
 #include <cstddef>
 #include <cstdint>
-#include <compare>
 namespace alloc
 {
     namespace detail
@@ -21,19 +21,22 @@ namespace alloc
         {
             bool b;
         };
-    }
+    } // namespace detail
 
-    constexpr detail::_color_flags_t RED{ false };
-    constexpr detail::_color_flags_t BLACK{ true };
+    constexpr detail::_color_flags_t RED{false};
+    constexpr detail::_color_flags_t BLACK{true};
 
-    constexpr detail::_type_flags_t FREE{ true };
-    constexpr detail::_type_flags_t USED{ false };
+    constexpr detail::_type_flags_t FREE{true};
+    constexpr detail::_type_flags_t USED{false};
 
     struct size_flags_t
     {
         size_t val;
 
-        size_flags_t() { val = 0; }
+        size_flags_t()
+        {
+            val = 0;
+        }
 
         size_flags_t(const detail::_color_flags_t& color, const detail::_type_flags_t& flags, size_t size)
         {
@@ -50,7 +53,10 @@ namespace alloc
             return *this;
         };
 
-        inline bool operator==(const detail::_color_flags_t& lhs) const { return (val & 1) == lhs.b; }
+        inline bool operator==(const detail::_color_flags_t& lhs) const
+        {
+            return (val & 1) == lhs.b;
+        }
 
         // type flags conversion
         inline size_flags_t& operator=(detail::_type_flags_t color)
@@ -60,9 +66,15 @@ namespace alloc
             return *this;
         }
 
-        inline constexpr operator uint64_t() const { return val & (~(size_t)3); }
+        inline constexpr operator uint64_t() const
+        {
+            return val & (~(size_t)3);
+        }
 
-        inline bool operator==(const detail::_type_flags_t& lhs) const { return (val & (size_t)2) == lhs.b; }
+        inline bool operator==(const detail::_type_flags_t& lhs) const
+        {
+            return (val & (size_t)2) == lhs.b;
+        }
 
         inline std::strong_ordering operator<=>(const size_flags_t& lhs) const
         {
@@ -77,8 +89,14 @@ namespace alloc
 
         // or + and operators for setting individual flags
 
-        inline bool get_color() const { return val & (size_t)1; }
-        inline bool get_type() const { return val & (size_t)2; }
+        inline bool get_color() const
+        {
+            return val & (size_t)1;
+        }
+        inline bool get_type() const
+        {
+            return val & (size_t)2;
+        }
         inline void copy_flags(const size_flags_t& rhs)
         {
             val &= ~(size_t)1;
@@ -98,7 +116,7 @@ namespace alloc
     {
         // in this case, size_flags includes the size of the header
         // this is very important, because the free block itself is free memory
-        size_flags_t size_flags = { RED, FREE, 0 };
+        size_flags_t size_flags = {RED, FREE, 0};
         void* back = nullptr;
         free_node* left = nullptr;
         free_node* right = nullptr;
@@ -107,9 +125,9 @@ namespace alloc
 
     struct alloced_node
     {
-        size_flags_t size_flags = { RED, USED, 0 };
+        size_flags_t size_flags = {RED, USED, 0};
         void* back = nullptr;
     };
-}
+} // namespace alloc
 
 #endif //__TYPES_H__

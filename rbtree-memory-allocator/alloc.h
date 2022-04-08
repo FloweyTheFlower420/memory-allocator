@@ -1,21 +1,18 @@
 #ifndef __RBTREE_ALLOC_H__
 #define __RBTREE_ALLOC_H__
+#include "rbtree_algo.h"
 #include <cstddef>
 #include <cstring>
-#include "rbtree_algo.h"
 
 namespace alloc
 {
     using memcpy_t = void* (*)(void*, void*, size_t);
 
-    template <memcpy_t memcpy_impl>
-    class memory_region
+    template <memcpy_t memcpy_impl> class memory_region
     {
         free_node* root_node;
         common_node* last;
-        constexpr
-    public:
-        memory_region(void* ptr, size_t size)
+        constexpr public : memory_region(void* ptr, size_t size)
         {
             root_node = (free_node*)ptr;
             new (ptr) free_node;
@@ -44,10 +41,10 @@ namespace alloc
             size = size & (~7);
 
             // 0.
-            free_node* node = upper_bound(root_node , size);
+            free_node* node = upper_bound(root_node, size);
 
             // 1.
-            if(node == nullptr)
+            if (node == nullptr)
                 return nullptr;
 
             // 2.
@@ -57,8 +54,8 @@ namespace alloc
             size_t current_size = node->size_flags;
 
             // obtain the size that shall remain for the free block
-            // if this size is less than to that of sizeof(free_node), that means we are forced to extend the memory block
-            // if not, we can place a header with a size of free_block_size
+            // if this size is less than to that of sizeof(free_node), that means we are forced to extend the memory
+            // block if not, we can place a header with a size of free_block_size
             size_t free_block_size = node->size_flags - sizeof(free_node) - size;
 
             // there is not enough room, extend allowed space
@@ -87,7 +84,7 @@ namespace alloc
                 free_node* next = new (ptr_add(node, sizeof(alloced_node) + size)) free_node;
 
                 // update next->next -> back pointer, size, and next -> back pointer
-                if(!is_next_last(node, last))
+                if (!is_next_last(node, last))
                     next_of(node)->back = (void*)next;
 
                 // we must compute the sizes of the blocks
@@ -146,7 +143,7 @@ namespace alloc
             bool is_next_free;
             bool is_prev_free;
 
-            if(is_next_last(used, last))
+            if (is_next_last(used, last))
                 is_next_free = false;
             else
                 is_next_free = ((size_flags_t*)next)->get_type();
@@ -165,9 +162,8 @@ namespace alloc
                 remove(next_node, root_node);
                 remove(prev_node, root_node);
                 // re-size prev_node
-                prev_node->size_flags = prev_node->size_flags +
-                                        used->size_flags +      // sizeof current node and header
-                                        next_node->size_flags;  // sizeof next node and header
+                prev_node->size_flags = prev_node->size_flags + used->size_flags + // sizeof current node and header
+                                        next_node->size_flags;                     // sizeof next node and header
 
                 insert(prev_node, root_node);
 
@@ -222,10 +218,9 @@ namespace alloc
             memcpy_impl(new_buf, buf, used->size_flags);
             free(buf);
             return new_buf;
-
         }
     };
 
-}
+} // namespace alloc
 
 #endif

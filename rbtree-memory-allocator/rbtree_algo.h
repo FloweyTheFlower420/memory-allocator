@@ -7,9 +7,9 @@
 
 #include "types.h"
 #include <cassert>
-#include <utility>
-#include <new>
 #include <cstddef>
+#include <new>
+#include <utility>
 
 namespace alloc
 {
@@ -19,7 +19,7 @@ namespace alloc
         {
             if (ptr)
                 return ptr->size_flags;
-            return { BLACK, FREE, 0 };
+            return {BLACK, FREE, 0};
         }
 
         constexpr static inline void set(free_node* ptr, _color_flags_t flags)
@@ -165,7 +165,8 @@ namespace alloc
                         sibling = parent->right;
                 }
 
-                if (get(parent) == BLACK && get(sibling) == BLACK && get(sibling->left) == BLACK && get(sibling->right) == BLACK)
+                if (get(parent) == BLACK && get(sibling) == BLACK && get(sibling->left) == BLACK &&
+                    get(sibling->right) == BLACK)
                 {
                     if (sibling)
                         set(sibling, RED);
@@ -181,14 +182,16 @@ namespace alloc
                     flag = false;
             }
 
-            if (get(parent) == RED && get(sibling) == BLACK && get(sibling->left) == BLACK && get(sibling->right) == BLACK)
+            if (get(parent) == RED && get(sibling) == BLACK && get(sibling->left) == BLACK &&
+                get(sibling->right) == BLACK)
             {
                 if (sibling)
                     set(sibling, RED);
                 set(parent, BLACK);
                 return;
             }
-            if (parent->right == child && get(sibling) == BLACK && get(sibling->right) == RED && get(sibling->left) == BLACK)
+            if (parent->right == child && get(sibling) == BLACK && get(sibling->right) == RED &&
+                get(sibling->left) == BLACK)
             {
                 set(sibling, RED);
                 set(sibling->right, BLACK);
@@ -198,7 +201,8 @@ namespace alloc
                 else
                     sibling = parent->right;
             }
-            else if (parent->left == child && get(sibling) == BLACK && get(sibling->left) == RED && get(sibling->right) == BLACK)
+            else if (parent->left == child && get(sibling) == BLACK && get(sibling->left) == RED &&
+                     get(sibling->right) == BLACK)
             {
                 set(sibling, RED);
                 set(sibling->left, BLACK);
@@ -245,7 +249,7 @@ namespace alloc
             if (child && child->parent == old_node)
                 child->parent = new_node;
         }
-    }
+    } // namespace detail
 
     static inline void insert(free_node* node, free_node*& root)
     {
@@ -335,7 +339,8 @@ namespace alloc
         change_parent(node->parent, node, child, root);
         change_child(child, node, node->parent);
 
-        if (get(node) == RED);
+        if (get(node) == RED)
+            ;
         else if (get(child) == RED)
         {
             if (child)
@@ -373,24 +378,20 @@ namespace alloc
         return tmp;
     }
 
-    template <typename T>
-    constexpr void* ptr_add(T* ptr, size_t n)
+    template <typename T> constexpr void* ptr_add(T* ptr, size_t n)
     {
         return (void*)((uint8_t*)ptr + n);
     }
 
-    template <typename T>
-    constexpr common_node* next_of(T* node)
+    template <typename T> constexpr common_node* next_of(T* node)
     {
         return (common_node*)ptr_add(node, node->size_flags + sizeof(T));
     }
 
-    template <typename T>
-    constexpr bool is_next_last(T* node, common_node* last_ptr)
+    template <typename T> constexpr bool is_next_last(T* node, common_node* last_ptr)
     {
         return (void*)next_of(node) == last_ptr;
     }
 }; // namespace alloc
-
 
 #endif //__RBTREE_ALGO_H__
