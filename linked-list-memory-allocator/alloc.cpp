@@ -111,7 +111,7 @@ namespace alloc
 
         char* src = (char*)buf;
         char* target = (char*)malloc(size + 16);
-        for (int i = 0; i < hdr->size; i++)
+        for (std::size_t i = 0; i < hdr->size; i++)
             target[i] = src[i];
         return target;
     }
