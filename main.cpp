@@ -4,53 +4,44 @@
 #include <iostream>
 #include <random>
 #include <vector>
-
+#include "linked-list-memory-allocator/extend_alloc.cpp"
 constexpr auto BUF = 100000;
 
-struct megablock_header
+void* buf = (void*)new uint64_t[BUF];
+using namespace alloc;
+void dump()
 {
-    megablock_header* next;
-    megablock_header* back;
-};
-
-struct block_header
-{
-    size_t size;
-    block_header* next;
-    block_header* back;
-};
-
-void dump(void* buf)
-{
-    megablock_header* a = (megablock_header*)buf;
-    while (a)
+    // std::cout << "Region:\n";
+    block_header* b = (block_header*)(buf);
+    while (b <= last)
     {
-        // std::cout << "Region:\n";
-        block_header* b = (block_header*)(a + 1);
-        while (b)
+        if (next_of(b) <= last && next_of(b)->back != b)
         {
-            if (b->next && b->next->back != b)
-            {
-                std::cerr << "LINK LIST ERROR!";
-                exit(-1);
-            }
-            if (b->size > 10000000)
-            {
-                std::cerr << "ILLEGAL SIZE! OVERFLOW!";
-                exit(-1);
-            }
-            // std::cout << "  " << b << ": size = " << b->size << " | next = " << b->next << " | back = " << b->back <<
-            // '\n';
-            b = b->next;
+            std::cerr << "LINK LIST ERROR!";
+            exit(-1);
         }
-        a = a->next;
+        if (b->size > 10000000)
+        {
+            std::cerr << "ILLEGAL SIZE! OVERFLOW!";
+            exit(-1);
+        }
+        std::cout << "  " << b << ": size = " << b->size << " | next = " << next_of(b) << " | back = " << b->back << '\n';
+        b = next_of(b);
     }
+}
+
+void* alloc::detail::start()
+{
+    return buf;
+}
+
+std::size_t alloc::detail::extend(void* current, std::size_t min)
+{
+    return min;
 }
 
 void rngcase()
 {
-    void* buf = (void*)new uint64_t[BUF];
-    alloc::add_region(buf, sizeof(uint64_t) * BUF);
     std::vector<void*> ptrs;
 
     for (int i = 0; i < 1000; i++)
@@ -61,7 +52,7 @@ void rngcase()
         {
             std::cout << "-- malloc test: " << j + 1 << '\n';
             ptrs.push_back(alloc::malloc(rand() % 13));
-            dump(buf);
+            dump();
         }
 
         std::shuffle(ptrs.begin(), ptrs.end(), std::default_random_engine(rand()));
@@ -73,7 +64,7 @@ void rngcase()
         {
             std::cout << "-- free test: " << j + 1 << '\n';
             alloc::free(ptrs.back());
-            dump(buf);
+            dump();
             ptrs.pop_back();
         }
 
@@ -82,7 +73,7 @@ void rngcase()
         {
             std::cout << "-- free2 test: " << j << '\n';
             alloc::free(ptrs.back());
-            dump(buf);
+            dump();
             ptrs.pop_back();
             j++;
         }
@@ -91,26 +82,21 @@ void rngcase()
     for (auto i : ptrs)
         alloc::free(i);
 
-    alloc::remove_region(buf);
-    delete[](uint64_t*) buf;
 }
 
 void foo()
 {
-    void* buf = (void*)new char[BUF];
-    alloc::add_region(buf, BUF);
-    void* a = alloc::malloc(10);
-    dump(buf);
+    void* a = alloc::malloc(100);
+    dump();
+    std::cout << '\n';
     void* b = alloc::malloc(10);
-    dump(buf);
-    void* c = alloc::malloc(10);
-    dump(buf);
+    dump();
+    std::cout << '\n';
     alloc::free(a);
-    dump(buf);
-    alloc::free(b);
-    dump(buf);
-    alloc::free(c);
-    dump(buf);
+    dump();
+    std::cout << '\n';
+    alloc::malloc(10);
+    dump();
 }
 
 int main(int argc, char** argv)

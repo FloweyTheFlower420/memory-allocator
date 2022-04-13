@@ -4,8 +4,17 @@
 
 namespace alloc
 {
+#ifdef BLOCK_ALLOC
     std::size_t add_region(void*, std::size_t);
     void remove_region(void*);
+#else
+    namespace detail
+    {
+        // CLIENT NEEDS TO IMPLEMENT
+        void* start();
+        std::size_t extend(void* current, std::size_t min);
+    }
+#endif
     void* malloc(std::size_t);
     void* realloc(void*, std::size_t);
     void* aligned_malloc(std::size_t, std::size_t);
