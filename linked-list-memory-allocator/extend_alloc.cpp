@@ -24,11 +24,11 @@ namespace alloc
         if (!size)
             return nullptr;
 
-        if(root == nullptr)
+        if (root == nullptr)
         {
             root = last = (block_header*)detail::start();
-            auto s = detail::extend((void*) root, size + sizeof(block_header));
-            auto r = new (root) block_header { s - sizeof(block_header), nullptr };
+            auto s = detail::extend((void*)root, size + sizeof(block_header));
+            auto r = new (root) block_header{s - sizeof(block_header), nullptr};
             return (void*)++r;
         }
 
@@ -45,7 +45,7 @@ namespace alloc
                     hdr->size = size;
                     auto* next_block = new (next_of(hdr)) block_header{(bsize - size - sizeof(block_header)) | 1, hdr};
 
-                    if(hdr == last)
+                    if (hdr == last)
                         last = next_block;
                     else
                         next_of(next_block)->back = next_block;
@@ -59,10 +59,10 @@ namespace alloc
 
         // extend memory and try to do stuff???
         std::size_t n = detail::extend((void*)next_of(last), size + 0x100) & ~7;
-        if((last->size & 1) == 0)
+        if ((last->size & 1) == 0)
         {
-            auto u = new (next_of(last)) block_header { size & ~1, last };
-            auto l = new (next_of(u)) block_header { (n - size - 2 * sizeof(block_header)) | 1, u };
+            auto u = new (next_of(last)) block_header{size & ~1, last};
+            auto l = new (next_of(u)) block_header{(n - size - 2 * sizeof(block_header)) | 1, u};
             last = l;
             return (void*)++u;
         }
@@ -123,7 +123,7 @@ namespace alloc
             if (next_of(next) <= last)
                 next_of(next)->back = prev;
 
-            if(next == last)
+            if (next == last)
                 last = prev;
         }
         else if (is_prev)
@@ -135,7 +135,7 @@ namespace alloc
             if (next <= last)
                 next->back = prev;
 
-            if(hdr == last)
+            if (hdr == last)
                 last = prev;
         }
         else if (is_next)
@@ -147,7 +147,7 @@ namespace alloc
             if (next_of(next) <= last)
                 next_of(next)->back = hdr;
 
-            if(next == last)
+            if (next == last)
                 last = hdr;
         }
         else

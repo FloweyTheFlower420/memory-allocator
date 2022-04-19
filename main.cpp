@@ -1,10 +1,10 @@
 #include "linked-list-memory-allocator/alloc.h"
+#include "linked-list-memory-allocator/extend_alloc.cpp"
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <random>
 #include <vector>
-#include "linked-list-memory-allocator/extend_alloc.cpp"
 constexpr auto BUF = 100000;
 
 void* buf = (void*)new uint64_t[BUF];
@@ -25,7 +25,8 @@ void dump()
             std::cerr << "ILLEGAL SIZE! OVERFLOW!";
             exit(-1);
         }
-        std::cout << "  " << b << ": size = " << b->size << " | next = " << next_of(b) << " | back = " << b->back << '\n';
+        std::cout << "  " << b << ": size = " << b->size << " | next = " << next_of(b) << " | back = " << b->back
+                  << '\n';
         b = next_of(b);
     }
 }
@@ -81,7 +82,6 @@ void rngcase()
 
     for (auto i : ptrs)
         alloc::free(i);
-
 }
 
 void foo()
